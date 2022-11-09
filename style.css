@@ -1,4 +1,45 @@
 body {
     margin: 0;
     padding: 0;
+    background-color: black;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#calculator {
+    width: 400px;
+    border: 6px solid white;
+}
+#output {
+    border: 2px solid white;
+}
+#queue {
+    padding-top: 10px;
+    padding-right: 10px;
+    height: 25px;
+    display: flex;
+    justify-content: flex-end;
+}
+#display {
+    height: 75px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    font-size: 64px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+div .button-row {
+    display: flex;
+}
+div .button {
+    border: 2px solid white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    font-weight: bold;
+    width: 100px;
+    height: 100px;
 }
