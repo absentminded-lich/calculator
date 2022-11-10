@@ -1,3 +1,6 @@
+let displayVal = '';
+let queue = [];
+// operations
 let add = (addend1, addend2) => addend1 + addend2;
 let subtract = (minuend, subtrahend) => minuend - subtrahend;
 let multiply = (multiplier, multiplicand) => multiplier * multiplicand;
@@ -15,10 +18,29 @@ let operate = (operator, num1, num2) => {
         default: break;
     }
 }
-// equals
-// clear
-// output
 
+let appendDigit = (digit) => {
+    if (displayVal.length < 10) displayVal += digit;
+    updateDisplay(displayVal);
+}
+let clearAll = () => {
+    displayVal = '';
+    queue = [];
+    updateDisplay(displayVal);
+    updateQueue(queue);
+}
+let updateDisplay = (str) => {
+    const display = document.querySelector('#display');
+    display.textContent = str;
+}
+
+const clear = document.querySelector('#clear');
+clear.addEventListener('click', () => clearAll());
+
+const digits = document.querySelectorAll('.digit');
+digits.forEach(digit => digit.addEventListener('click', () => appendDigit(digit.id)));
+
+// equals
 // tenth decimal
 // backspace
 // keyboard support
