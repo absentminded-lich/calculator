@@ -19,20 +19,21 @@ let operate = (operator, num1, num2) => {
     }
 }
 
-let appendDigit = (digit) => {
-    if (displayVal.length < 10) displayVal += digit;
-    updateDisplay(displayVal);
-}
-let clearAll = () => {
-    displayVal = '';
+const appendDigit = (digit) => {if (displayVal.length < 10) updateDisplay(displayVal += digit)}
+const clearAll = () => {
     queue = [];
-    updateDisplay(displayVal);
-    updateQueue(queue);
+    updateDisplay('');
+    //updateQueue(queue);
 }
-let updateDisplay = (str) => {
+const removeDigit = () => {if (displayVal.length > 0) updateDisplay(displayVal.substring(0, displayVal.length - 1))}
+const updateDisplay = (str) => {
+    displayVal = str;
     const display = document.querySelector('#display');
-    display.textContent = str;
+    display.textContent = displayVal;
 }
+
+const backspace = document.querySelector('#backspace');
+backspace.addEventListener('click', () => removeDigit());
 
 const clear = document.querySelector('#clear');
 clear.addEventListener('click', () => clearAll());
@@ -42,5 +43,4 @@ digits.forEach(digit => digit.addEventListener('click', () => appendDigit(digit.
 
 // equals
 // tenth decimal
-// backspace
 // keyboard support
