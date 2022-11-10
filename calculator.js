@@ -1,12 +1,12 @@
 let display = '';
 let queue = [];
 // operations
-let add = (addend1, addend2) => addend1 + addend2;
-let subtract = (minuend, subtrahend) => minuend - subtrahend;
-let multiply = (multiplier, multiplicand) => multiplier * multiplicand;
+let add = (addend1, addend2) => +addend1 + +addend2;
+let subtract = (minuend, subtrahend) => +minuend - +subtrahend;
+let multiply = (multiplier, multiplicand) => +multiplier * +multiplicand;
 let divide = (dividend, divisor) => {
-    if (divisor === 0) return undefined;
-    return dividend / divisor;
+    if (+divisor === 0) return undefined;
+    return +dividend / +divisor;
 }
 let operate = (operator, num1, num2) => {
     if (typeof operator === 'function') return operator(num1, num2); // just because
@@ -20,6 +20,7 @@ let operate = (operator, num1, num2) => {
 }
 
 const appendDigit = (str) => {
+    // trim to tenth
     if (display.length < 10) display += str;
     updateDisplay();
 }
@@ -34,7 +35,11 @@ const clearDisplay = () => {
 }
 const updateDisplay = () => document.querySelector('#display').textContent = display;
 // queue
-const appendQueue = (str) => {
+const popFromQueue = () => {
+    queue.pop();
+    updateQueue;
+}
+const pushToQueue = (str) => {
     queue.push(str);
     updateQueue();
 }
@@ -53,13 +58,49 @@ clear.addEventListener('click', () => {clearDisplay(); clearQueue();});
 const digits = document.querySelectorAll('.digit');
 digits.forEach(digit => digit.addEventListener('click', () => appendDigit(digit.id)));
 
+const equal = document.querySelector('#equal');
+equal.addEventListener('click', () => {
+    if (queue.length === 0) return;
+    (display === '') ? popFromQueue() : pushToQueue(display);
+
+    const MDAS = [['*', '/'], ['+', '-']];
+    MDAS.forEach(operator => {
+        while (true) {
+            let i = queue.findIndex(element => element === operator[0] || element === operator[1]);
+            if (i === -1) break;
+
+            let newNum = operate(queue[i], queue[i - 1], queue[i + 1]);
+            // if newNum is undefined then we have an end of the universe scenario
+            // function this
+            queue = [
+                ...queue.slice(0, i - 1),
+                newNum.toString(),
+                ...queue.slice(i + 2)
+            ];
+
+            if (queue.length === 1) {
+                // replaceDigit function for this and below
+                clearDisplay();
+                appendDigit(newNum);
+                return;
+            } else if (queue.length <= 0) {
+                clearDisplay();
+                appendDigit('ERROR');
+                return;
+            }
+        }
+    });
+});
+
 const operators = document.querySelectorAll('.operator');
 operators.forEach(operator => operator.addEventListener('click', () => {
-    appendQueue(display);
+    pushToQueue(display);
     clearDisplay();
-    appendQueue(operator.id);
+    pushToQueue(operator.id);
 }));
 
-// equals
 // tenth decimal
 // keyboard support
+// clear queue and display when next button after equal is pressed
+// do not accept operator button without number first
+// consider pushing '=' to queue
