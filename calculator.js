@@ -1,14 +1,15 @@
 let display = '';
 let queue = [];
+const MAX_DISPLAY_LENGTH = 10;
 // operations
-let add = (addend1, addend2) => +addend1 + +addend2;
-let subtract = (minuend, subtrahend) => +minuend - +subtrahend;
-let multiply = (multiplier, multiplicand) => +multiplier * +multiplicand;
-let divide = (dividend, divisor) => {
+const add = (addend1, addend2) => +addend1 + +addend2;
+const subtract = (minuend, subtrahend) => +minuend - +subtrahend;
+const multiply = (multiplier, multiplicand) => +multiplier * +multiplicand;
+const divide = (dividend, divisor) => {
     if (parseInt(divisor) === 0) return undefined;
     return +dividend / +divisor;
 }
-let operate = (operator, num1, num2) => {
+const operate = (operator, num1, num2) => {
     if (typeof operator === 'function') return operator(num1, num2); // just because
     switch (operator) {
         case '+': return add(num1, num2);
@@ -20,31 +21,27 @@ let operate = (operator, num1, num2) => {
 }
 // display
 const appendDigit = (str) => {
-    // trim to tenth
-    if (display.length < 10) display += str;
-    updateDisplay();
+    if (display.length < MAX_DISPLAY_LENGTH) setDisplay(display += str);
 }
 const removeDigit = () => {
-    if (display.length > 0) display = display.substring(0, display.length - 1);
-    updateDisplay();
+    if (display.length > 0) setDisplay(display.substring(0, display.length - 1));
 }
-const clearDisplay = () => setDisplay();
+const clearDisplay = () => setDisplay('');
 const setDisplay = (str = '') => {
     display = str;
     updateDisplay();
 }
-const updateDisplay = () => document.querySelector('#display').textContent = display;
+const updateDisplay = () => {
+    if (display.length > MAX_DISPLAY_LENGTH) display = display.substring(0, 10);
+    if (!isNaN(display) && display.toString().includes('.')) display = parseFloat(display).toFixed(1).toString();
+    document.querySelector('#display').textContent = display;
+}
 // queue
-const popFromQueue = () => {
-    queue.pop();
-    updateQueue;
-}
-const pushToQueue = (str) => {
-    queue.push(str);
-    updateQueue();
-}
-const clearQueue = () => {
-    queue = [];
+const popFromQueue = () => setQueue(queue.slice(0, queue.length - 1));
+const pushToQueue = (str) => setQueue([...queue, str]);
+const clearQueue = () => setQueue([]);
+const setQueue = (strArray = []) => {
+    queue = strArray;
     updateQueue();
 }
 const updateQueue = () => document.querySelector('#queue').textContent = queue.join(' ');
@@ -66,24 +63,25 @@ equal.addEventListener('click', () => {
     if (queue.length === 0) return;
     (display === '') ? popFromQueue() : pushToQueue(display);
 
+    let queueCopy = queue;
     const MDAS = [['*', '/'], ['+', '-']];
     MDAS.forEach(operator => {
         while (true) {
-            let i = queue.findIndex(element => element === operator[0] || element === operator[1]);
+            let i = queueCopy.findIndex(element => element === operator[0] || element === operator[1]);
             if (i === -1) break;
 
-            let newNum = operate(queue[i], queue[i - 1], queue[i + 1]);
+            let newNum = operate(queueCopy[i], queueCopy[i - 1], queueCopy[i + 1]);
             if (newNum === undefined) {
                 setDisplay('uh oh');
                 return;
             }
 
-            queue.splice(i - 1, 3, newNum.toString());
+            queueCopy.splice(i - 1, 3, newNum.toString());
 
-            if (queue.length === 1) {
+            if (queueCopy.length === 1) {
                 setDisplay(newNum);
                 return;
-            } else if (queue.length <= 0) {
+            } else if (queueCopy.length <= 0) {
                 setDisplay('ERROR');
                 return;
             }
