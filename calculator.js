@@ -18,7 +18,7 @@ let operate = (operator, num1, num2) => {
         default: break;
     }
 }
-
+// display
 const appendDigit = (str) => {
     // trim to tenth
     if (display.length < 10) display += str;
@@ -28,9 +28,9 @@ const removeDigit = () => {
     if (display.length > 0) display = display.substring(0, display.length - 1);
     updateDisplay();
 }
-// display
-const clearDisplay = () => {
-    display = '';
+const clearDisplay = () => setDisplay();
+const setDisplay = (str = '') => {
+    display = str;
     updateDisplay();
 }
 const updateDisplay = () => document.querySelector('#display').textContent = display;
@@ -53,7 +53,10 @@ const backspace = document.querySelector('#backspace');
 backspace.addEventListener('click', () => removeDigit());
 
 const clear = document.querySelector('#clear');
-clear.addEventListener('click', () => {clearDisplay(); clearQueue();});
+clear.addEventListener('click', () => {
+    clearDisplay();
+    clearQueue();
+});
 
 const digits = document.querySelectorAll('.digit');
 digits.forEach(digit => digit.addEventListener('click', () => appendDigit(digit.id)));
@@ -71,25 +74,17 @@ equal.addEventListener('click', () => {
 
             let newNum = operate(queue[i], queue[i - 1], queue[i + 1]);
             if (newNum === undefined) {
-                clearDisplay();
-                appendDigit('uh oh');
+                setDisplay('uh oh');
                 return;
             }
-            // function this
-            queue = [
-                ...queue.slice(0, i - 1),
-                newNum.toString(),
-                ...queue.slice(i + 2)
-            ];
+
+            queue.splice(i - 1, 3, newNum.toString());
 
             if (queue.length === 1) {
-                // replaceDigit function for this and below
-                clearDisplay();
-                appendDigit(newNum);
+                setDisplay(newNum);
                 return;
             } else if (queue.length <= 0) {
-                clearDisplay();
-                appendDigit('ERROR');
+                setDisplay('ERROR');
                 return;
             }
         }
@@ -98,6 +93,7 @@ equal.addEventListener('click', () => {
 
 const operators = document.querySelectorAll('.operator');
 operators.forEach(operator => operator.addEventListener('click', () => {
+    if (display === '') return;
     pushToQueue(display);
     clearDisplay();
     pushToQueue(operator.id);
@@ -106,6 +102,5 @@ operators.forEach(operator => operator.addEventListener('click', () => {
 // tenth decimal
 // keyboard support
 // clear queue and display when next button after equal is pressed
-// do not accept operator button without number first
 // consider pushing '=' to queue
 // trim leading 0s
