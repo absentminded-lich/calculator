@@ -5,7 +5,7 @@ let add = (addend1, addend2) => +addend1 + +addend2;
 let subtract = (minuend, subtrahend) => +minuend - +subtrahend;
 let multiply = (multiplier, multiplicand) => +multiplier * +multiplicand;
 let divide = (dividend, divisor) => {
-    if (+divisor === 0) return undefined;
+    if (parseInt(divisor) === 0) return undefined;
     return +dividend / +divisor;
 }
 let operate = (operator, num1, num2) => {
@@ -70,7 +70,11 @@ equal.addEventListener('click', () => {
             if (i === -1) break;
 
             let newNum = operate(queue[i], queue[i - 1], queue[i + 1]);
-            // if newNum is undefined then we have an end of the universe scenario
+            if (newNum === undefined) {
+                clearDisplay();
+                appendDigit('uh oh');
+                return;
+            }
             // function this
             queue = [
                 ...queue.slice(0, i - 1),
@@ -104,3 +108,4 @@ operators.forEach(operator => operator.addEventListener('click', () => {
 // clear queue and display when next button after equal is pressed
 // do not accept operator button without number first
 // consider pushing '=' to queue
+// trim leading 0s
