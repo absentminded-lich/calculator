@@ -43,4 +43,9 @@ div .button {
     width: 100px;
     height: 100px;
     cursor: pointer;
+    transition: all 0.13s ease;
+}
+div .button .clicked {
+    background-color: white;
+    color: black;
 }

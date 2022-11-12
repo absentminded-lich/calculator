@@ -49,6 +49,14 @@ const updateQueue = () => document.querySelector('#queue').textContent = queue.j
 const backspace = document.querySelector('#backspace');
 backspace.addEventListener('click', () => removeDigit());
 
+const buttons = document.querySelectorAll('.button');
+buttons.forEach(button => button.addEventListener('click', () => {
+    button.classList.add('clicked');
+}));
+buttons.forEach(button => button.addEventListener('transitionend', () => {
+    button.classList.remove('clicked');
+}));
+
 const clear = document.querySelector('#clear');
 clear.addEventListener('click', () => {
     clearDisplay();
@@ -82,7 +90,7 @@ equal.addEventListener('click', () => {
                 setDisplay(newNum);
                 return;
             } else if (queueCopy.length <= 0) {
-                setDisplay('ERROR');
+                setDisplay('ERR');
                 return;
             }
         }
