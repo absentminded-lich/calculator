@@ -45,7 +45,7 @@ div .button {
     cursor: pointer;
     transition: all 0.13s ease;
 }
-div .button .clicked {
+div .button.clicked {
     background-color: white;
     color: black;
 }
