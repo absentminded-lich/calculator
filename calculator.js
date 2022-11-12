@@ -56,7 +56,7 @@ clear.addEventListener('click', () => {
 });
 
 const digits = document.querySelectorAll('.digit');
-digits.forEach(digit => digit.addEventListener('click', () => appendDigit(digit.id)));
+digits.forEach(digit => digit.addEventListener('click', () => appendDigit(digit.dataset.key)));
 
 const equal = document.querySelector('#equal');
 equal.addEventListener('click', () => {
@@ -94,11 +94,15 @@ operators.forEach(operator => operator.addEventListener('click', () => {
     if (display === '') return;
     pushToQueue(display);
     clearDisplay();
-    pushToQueue(operator.id);
+    pushToQueue(operator.dataset.key);
 }));
 
+document.addEventListener('keydown', (event) => {
+    const button = document.querySelector(`.button[data-key="${event.key}"]`);
+    if(button) button.click();
+});
+
 // tenth decimal
-// keyboard support
 // clear queue and display when next button after equal is pressed
 // consider pushing '=' to queue
 // trim leading 0s
