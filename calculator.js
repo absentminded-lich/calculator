@@ -49,9 +49,13 @@ const updateQueue = () => document.querySelector('#queue').textContent = queue.j
 const backspace = document.querySelector('#backspace');
 backspace.addEventListener('click', () => removeDigit());
 
-const buttons = document.querySelectorAll('.button');
+const buttons = document.querySelectorAll('.button'); 
 buttons.forEach(button => button.addEventListener('click', () => {
     button.classList.add('clicked');
+    if (queue[queue.length - 1] === '=') {
+        clearDisplay();
+        clearQueue();
+    }
 }));
 buttons.forEach(button => button.addEventListener('transitionend', () => {
     button.classList.remove('clicked');
@@ -70,6 +74,7 @@ const equal = document.querySelector('#equal');
 equal.addEventListener('click', () => {
     if (queue.length === 0) return;
     (display === '') ? popFromQueue() : pushToQueue(display);
+    pushToQueue('=');
 
     let queueCopy = queue;
     const MDAS = [['*', '/'], ['+', '-']];
@@ -86,10 +91,10 @@ equal.addEventListener('click', () => {
 
             queueCopy.splice(i - 1, 3, newNum.toString());
 
-            if (queueCopy.length === 1) {
+            if (queueCopy.length === 2) {
                 setDisplay(newNum);
                 return;
-            } else if (queueCopy.length <= 0) {
+            } else if (queueCopy.length <= 1) {
                 setDisplay('ERR');
                 return;
             }
@@ -111,6 +116,8 @@ document.addEventListener('keydown', (event) => {
 });
 
 // tenth decimal
-// clear queue and display when next button after equal is pressed
-// consider pushing '=' to queue
 // trim leading 0s
+// condense all events into functions
+// fix bug where css sticks if a new transition starts before the last transitionend triggers
+// restyle
+// consider Odin toggle button (L2R vs PEMDAS)
