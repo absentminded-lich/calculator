@@ -32,17 +32,21 @@ const setDisplay = (str = '') => {
     updateDisplay();
 }
 const updateDisplay = () => {
+    display = trimExcess(display);
     if (display.length > MAX_DISPLAY_LENGTH) display = display.substring(0, 10);
-    if (!isNaN(display) && display.toString().includes('.')) display = parseFloat(display).toFixed(1).toString();
-    document.querySelector('#display').textContent = display;
+    document.querySelector('#display').textContent = display
 }
 // queue
 const popFromQueue = () => setQueue(queue.slice(0, queue.length - 1));
-const pushToQueue = (str) => setQueue([...queue, str]);
+const pushToQueue = (str) => setQueue([...queue, trimExcess(str)]);
 const clearQueue = () => setQueue([]);
 const setQueue = (strArray = []) => {
     queue = strArray;
     updateQueue();
+}
+const trimExcess = (str) => {
+    if (!isNaN(str) && str !== '') return (str.toString().includes('.')) ? parseFloat(str).toFixed(1).toString() : parseInt(str).toString();
+    return str;
 }
 const updateQueue = () => document.querySelector('#queue').textContent = queue.join(' ');
 
@@ -116,7 +120,6 @@ document.addEventListener('keydown', (event) => {
 });
 
 // tenth decimal
-// trim leading 0s
 // condense all events into functions
 // fix bug where css sticks if a new transition starts before the last transitionend triggers
 // restyle
