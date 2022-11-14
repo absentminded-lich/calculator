@@ -33,10 +33,16 @@ const setDisplay = (str = '') => {
 }
 const updateDisplay = () => {
     display = trimExcess(display);
-    if (display.length > MAX_DISPLAY_LENGTH) display = display.substring(0, 10);
+    if (display.length > MAX_DISPLAY_LENGTH) display = display.substring(0, MAX_DISPLAY_LENGTH);
     document.querySelector('#display').textContent = display
 }
 // queue
+const appendOperator = (operator) => {
+    if (display === '') return;
+    pushToQueue(display);
+    clearDisplay();
+    pushToQueue(operator);
+}
 const popFromQueue = () => setQueue(queue.slice(0, queue.length - 1));
 const pushToQueue = (str) => setQueue([...queue, trimExcess(str)]);
 const clearQueue = () => setQueue([]);
@@ -50,38 +56,18 @@ const trimExcess = (str) => {
 }
 const updateQueue = () => document.querySelector('#queue').textContent = queue.join(' ');
 
-const backspace = document.querySelector('#backspace');
-backspace.addEventListener('click', () => removeDigit());
-
-const buttons = document.querySelectorAll('.button'); 
-buttons.forEach(button => {
-    button.addEventListener('click', () => {
-        button.classList.add('clicked');
-        if (queue[queue.length - 1] === '=') {
-            clearDisplay();
-            clearQueue();
-        }
-    });
-    button.addEventListener('transitionend', () => {
-        button.classList.remove('clicked');
-    });
-});
-
-const clear = document.querySelector('#clear');
-clear.addEventListener('click', () => {
+const clear = () => {
     clearDisplay();
     clearQueue();
-});
-
-const digits = document.querySelectorAll('.digit');
-digits.forEach(digit => digit.addEventListener('click', () => appendDigit(digit.dataset.key)));
-
-const equal = document.querySelector('#equal');
-equal.addEventListener('click', () => {
+}
+const equal = () => {
     if (queue.length === 0) return;
     (display === '') ? popFromQueue() : pushToQueue(display);
     pushToQueue('=');
 
+    MDAS();
+}
+const MDAS = () => {
     let queueCopy = queue;
     const MDAS = [['*', '/'], ['+', '-']];
     MDAS.forEach(operator => {
@@ -106,22 +92,38 @@ equal.addEventListener('click', () => {
             }
         }
     });
+}
+
+const backspaceBtn = document.querySelector('#backspace');
+backspaceBtn.addEventListener('click', () => removeDigit());
+
+const buttons = document.querySelectorAll('.button'); 
+buttons.forEach(button => {
+    button.addEventListener('click', () => {
+        button.classList.add('clicked');
+        if (queue[queue.length - 1] === '=') clear();
+    });
+
+    button.addEventListener('transitionend', () => button.classList.remove('clicked'));
 });
 
-const operators = document.querySelectorAll('.operator');
-operators.forEach(operator => operator.addEventListener('click', () => {
-    if (display === '') return;
-    pushToQueue(display);
-    clearDisplay();
-    pushToQueue(operator.dataset.key);
-}));
+const clearBtn = document.querySelector('#clear');
+clearBtn.addEventListener('click', () => clear());
+
+const digitBtns = document.querySelectorAll('.digit');
+digitBtns.forEach(digitBtn => digitBtn.addEventListener('click', () => appendDigit(digitBtn.dataset.key)));
+
+const equalBtn = document.querySelector('#equal');
+equalBtn.addEventListener('click', () => equal());
+
+const operatorBtns = document.querySelectorAll('.operator');
+operatorBtns.forEach(operatorBtn => operatorBtn.addEventListener('click', () => appendOperator(operatorBtn.dataset.key)));
 
 document.addEventListener('keydown', (event) => {
     const button = document.querySelector(`.button[data-key="${event.key}"]`);
-    if(button) button.click();
+    if (button) button.click();
 });
 
 // tenth decimal
 // condense all events into functions
-// fix bug where css sticks if a new transition starts before the last transitionend triggers
 // consider Odin toggle button (L2R vs PEMDAS)
