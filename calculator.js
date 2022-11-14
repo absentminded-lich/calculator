@@ -1,6 +1,6 @@
 let display = '';
 let queue = [];
-const MAX_DISPLAY_LENGTH = 12;
+const MAX_DISPLAY_LENGTH = 8;
 // operations
 const add = (addend1, addend2) => +addend1 + +addend2;
 const subtract = (minuend, subtrahend) => +minuend - +subtrahend;
@@ -21,12 +21,14 @@ const operate = (operator, num1, num2) => {
 }
 // display
 const appendDigit = (str) => {
+    if (queueHasEqual()) clear();
     if (display.length < MAX_DISPLAY_LENGTH) setDisplay(display += str);
 }
+const clearDisplay = () => setDisplay('');
 const removeDigit = () => {
+    if (queueHasEqual()) clear();
     if (display.length > 0) setDisplay(display.substring(0, display.length - 1));
 }
-const clearDisplay = () => setDisplay('');
 const setDisplay = (str = '') => {
     display = str;
     updateDisplay();
@@ -39,13 +41,15 @@ const updateDisplay = () => {
 // queue
 const appendOperator = (operator) => {
     if (display === '') return;
+    if (queueHasEqual()) clearQueue();
     pushToQueue(display);
     clearDisplay();
     pushToQueue(operator);
 }
+const clearQueue = () => setQueue([]);
 const popFromQueue = () => setQueue(queue.slice(0, queue.length - 1));
 const pushToQueue = (str) => setQueue([...queue, trimExcess(str)]);
-const clearQueue = () => setQueue([]);
+const queueHasEqual = () => {return (queue[queue.length - 1] === '=')};
 const setQueue = (strArray = []) => {
     queue = strArray;
     updateQueue();
@@ -61,7 +65,7 @@ const clear = () => {
     clearQueue();
 }
 const equal = () => {
-    if (queue.length === 0) return;
+    if (queue.length === 0 || queueHasEqual()) return;
     (display === '') ? popFromQueue() : pushToQueue(display);
     pushToQueue('=');
 
@@ -99,11 +103,7 @@ backspaceBtn.addEventListener('click', () => removeDigit());
 
 const buttons = document.querySelectorAll('.button'); 
 buttons.forEach(button => {
-    button.addEventListener('click', () => {
-        button.classList.add('clicked');
-        if (queue[queue.length - 1] === '=') clear();
-    });
-
+    button.addEventListener('click', () => button.classList.add('clicked'));
     button.addEventListener('transitionend', () => button.classList.remove('clicked'));
 });
 
@@ -125,5 +125,4 @@ document.addEventListener('keydown', (event) => {
 });
 
 // tenth decimal
-// condense all events into functions
 // consider Odin toggle button (L2R vs PEMDAS)
