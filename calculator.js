@@ -1,6 +1,6 @@
 let display = '';
 let queue = [];
-const MAX_DISPLAY_LENGTH = 10;
+const MAX_DISPLAY_LENGTH = 12;
 // operations
 const add = (addend1, addend2) => +addend1 + +addend2;
 const subtract = (minuend, subtrahend) => +minuend - +subtrahend;
@@ -54,16 +54,18 @@ const backspace = document.querySelector('#backspace');
 backspace.addEventListener('click', () => removeDigit());
 
 const buttons = document.querySelectorAll('.button'); 
-buttons.forEach(button => button.addEventListener('click', () => {
-    button.classList.add('clicked');
-    if (queue[queue.length - 1] === '=') {
-        clearDisplay();
-        clearQueue();
-    }
-}));
-buttons.forEach(button => button.addEventListener('transitionend', () => {
-    button.classList.remove('clicked');
-}));
+buttons.forEach(button => {
+    button.addEventListener('click', () => {
+        button.classList.add('clicked');
+        if (queue[queue.length - 1] === '=') {
+            clearDisplay();
+            clearQueue();
+        }
+    });
+    button.addEventListener('transitionend', () => {
+        button.classList.remove('clicked');
+    });
+});
 
 const clear = document.querySelector('#clear');
 clear.addEventListener('click', () => {
@@ -122,5 +124,4 @@ document.addEventListener('keydown', (event) => {
 // tenth decimal
 // condense all events into functions
 // fix bug where css sticks if a new transition starts before the last transitionend triggers
-// restyle
 // consider Odin toggle button (L2R vs PEMDAS)
