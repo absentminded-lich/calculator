@@ -50,7 +50,7 @@ const appendOperator = (operator) => {
     if (display === '' && queue.length > 0 && !queueHasEqual()) {
         popFromQueue();
         pushToQueue(operator);
-    } else if (display !== '') {
+    } else if (display !== '' && !isNaN(display)) {
         if (queueHasEqual()) clearQueue();
         pushToQueue(display);
         clearDisplay();
@@ -80,42 +80,68 @@ const equal = () => {
     (display === '') ? popFromQueue() : pushToQueue(display);
     pushToQueue('=');
 
-    MDAS();
+    orderOfOp();
 }
-const MDAS = () => {
+const L2R = () => {
     let queueCopy = queue;
-    const MDAS = [['*', '/'], ['+', '-']];
-    MDAS.forEach(operator => {
+    try {
         while (true) {
-            let i = queueCopy.findIndex(element => element === operator[0] || element === operator[1]);
-            if (i === -1) break;
+            let newNum = operate(queueCopy[1], queueCopy[0], queueCopy[2]);
+            if (newNum === undefined) throw singularityEvent();
 
-            let newNum = operate(queueCopy[i], queueCopy[i - 1], queueCopy[i + 1]);
-            if (newNum === undefined) {
-                setDisplay('uh oh');
-                return;
-            }
-
-            queueCopy.splice(i - 1, 3, newNum.toString());
+            queueCopy.splice(0, 3, newNum.toString());
 
             if (queueCopy.length === 2) {
                 setDisplay(formatStrLikeNum(newNum));
                 return;
-            } else if (queueCopy.length <= 1) {
-                setDisplay('ERR');
-                return;
             }
+            if (queueCopy.length <= 1) 'ERR';
         }
-    });
+    } catch(err) {
+        console.log(err);
+        setDisplay(err);
+    }
 }
+const MDAS = () => {
+    let queueCopy = queue;
+    try {
+        const MDAS = [['*', '/'], ['+', '-']];
+        MDAS.forEach(operator => {
+            while (true) {
+                let i = queueCopy.findIndex(element => element === operator[0] || element === operator[1]);
+                if (i === -1) break;
+
+                let newNum = operate(queueCopy[i], queueCopy[i - 1], queueCopy[i + 1]);
+                if (newNum === undefined) throw singularityEvent();
+
+                queueCopy.splice(i - 1, 3, newNum.toString());
+
+                if (queueCopy.length === 2) {
+                    setDisplay(formatStrLikeNum(newNum));
+                    return;
+                }
+                if (queueCopy.length <= 1) 'ERR';
+            }
+        });
+    } catch(err) {
+        console.log(err);
+        setDisplay(err);
+    }
+}
+const singularityEvent = () => {return 'uh oh';}
+const toggleOrderOfOp = () => orderOfOp = (orderOfOp.name === 'MDAS') ? L2R : MDAS;
 
 const backspaceBtn = document.querySelector('#backspace');
 backspaceBtn.addEventListener('click', () => removeDigit());
 
 const buttons = document.querySelectorAll('.button'); 
 buttons.forEach(button => {
-    button.addEventListener('click', () => button.classList.add('clicked'));
-    button.addEventListener('transitionend', () => button.classList.remove('clicked'));
+    if (button.id === 'l2r') {
+        button.addEventListener('click', () => button.classList.toggle('clicked'));
+    } else {
+        button.addEventListener('click', () => button.classList.add('clicked'));
+        button.addEventListener('transitionend', () => button.classList.remove('clicked'));
+    }
 });
 
 const clearBtn = document.querySelector('#clear');
@@ -130,6 +156,9 @@ digitBtns.forEach(digitBtn => digitBtn.addEventListener('click', () => appendDig
 const equalBtn = document.querySelector('#equal');
 equalBtn.addEventListener('click', () => equal());
 
+const l2rBtn = document.querySelector('#l2r');
+l2rBtn.addEventListener('click', () => toggleOrderOfOp());
+
 const operatorBtns = document.querySelectorAll('.operator');
 operatorBtns.forEach(operatorBtn => operatorBtn.addEventListener('click', () => appendOperator(operatorBtn.dataset.key)));
 
@@ -138,4 +167,4 @@ document.addEventListener('keydown', (event) => {
     if (button) button.click();
 });
 
-// consider Odin toggle button (L2R vs PEMDAS)
+let orderOfOp = MDAS;
