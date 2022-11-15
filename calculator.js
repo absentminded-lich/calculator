@@ -22,9 +22,17 @@ const operate = (operator, num1, num2) => {
 // display
 const appendDigit = (str) => {
     if (queueHasEqual()) clear();
-    if (display.length < MAX_DISPLAY_LENGTH) setDisplay(display += str);
+    if (!displayIsMaxLength() && (!display.includes('.') || (display.charAt(display.length - 1) === '.'))) setDisplay(display += str);
+}
+const appendDecimal = () => {
+    if (queueHasEqual()) clear();
+    if (!displayIsMaxLength()) {
+        if (display.includes('.')) return;
+        (display.length === 0) ? setDisplay(display += '0.') : setDisplay(display += '.');
+    }
 }
 const clearDisplay = () => setDisplay('');
+const displayIsMaxLength = () => {return display.length >= MAX_DISPLAY_LENGTH;}
 const removeDigit = () => {
     if (queueHasEqual()) clear();
     if (display.length > 0) setDisplay(display.substring(0, display.length - 1));
@@ -34,27 +42,30 @@ const setDisplay = (str = '') => {
     updateDisplay();
 }
 const updateDisplay = () => {
-    display = trimExcess(display);
     if (display.length > MAX_DISPLAY_LENGTH) display = display.substring(0, MAX_DISPLAY_LENGTH);
     document.querySelector('#display').textContent = display
 }
 // queue
 const appendOperator = (operator) => {
-    if (display === '') return;
-    if (queueHasEqual()) clearQueue();
-    pushToQueue(display);
-    clearDisplay();
-    pushToQueue(operator);
+    if (display === '' && queue.length > 0 && !queueHasEqual()) {
+        popFromQueue();
+        pushToQueue(operator);
+    } else if (display !== '') {
+        if (queueHasEqual()) clearQueue();
+        pushToQueue(display);
+        clearDisplay();
+        pushToQueue(operator);
+    }
 }
 const clearQueue = () => setQueue([]);
 const popFromQueue = () => setQueue(queue.slice(0, queue.length - 1));
-const pushToQueue = (str) => setQueue([...queue, trimExcess(str)]);
+const pushToQueue = (str) => setQueue([...queue, formatStrLikeNum(str)]);
 const queueHasEqual = () => {return (queue[queue.length - 1] === '=')};
 const setQueue = (strArray = []) => {
     queue = strArray;
     updateQueue();
 }
-const trimExcess = (str) => {
+const formatStrLikeNum = (str) => {
     if (!isNaN(str) && str !== '') return (str.toString().includes('.')) ? parseFloat(str).toFixed(1).toString() : parseInt(str).toString();
     return str;
 }
@@ -88,7 +99,7 @@ const MDAS = () => {
             queueCopy.splice(i - 1, 3, newNum.toString());
 
             if (queueCopy.length === 2) {
-                setDisplay(newNum);
+                setDisplay(formatStrLikeNum(newNum));
                 return;
             } else if (queueCopy.length <= 1) {
                 setDisplay('ERR');
@@ -110,6 +121,9 @@ buttons.forEach(button => {
 const clearBtn = document.querySelector('#clear');
 clearBtn.addEventListener('click', () => clear());
 
+const decimalBtn = document.querySelector('#decimal');
+decimalBtn.addEventListener('click', () => appendDecimal());
+
 const digitBtns = document.querySelectorAll('.digit');
 digitBtns.forEach(digitBtn => digitBtn.addEventListener('click', () => appendDigit(digitBtn.dataset.key)));
 
@@ -124,5 +138,4 @@ document.addEventListener('keydown', (event) => {
     if (button) button.click();
 });
 
-// tenth decimal
 // consider Odin toggle button (L2R vs PEMDAS)
