@@ -1,3 +1,7 @@
+html {
+    /* Firefox */
+    min-height: 100%;
+}
 body {
     font-family: "Orbitron", sans-serif;
     margin: 0;
@@ -7,6 +11,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    /* Firefox */
+    height: 100%;
 }
 #calculator {
     border: 25px solid rgba(255, 255, 255, 0.5);

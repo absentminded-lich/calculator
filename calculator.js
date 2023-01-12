@@ -6,7 +6,7 @@ const add = (addend1, addend2) => +addend1 + +addend2;
 const subtract = (minuend, subtrahend) => +minuend - +subtrahend;
 const multiply = (multiplier, multiplicand) => +multiplier * +multiplicand;
 const divide = (dividend, divisor) => {
-    if (parseInt(divisor) === 0) return undefined;
+    if (parseFloat(divisor) === 0.0) return undefined;
     return +dividend / +divisor;
 }
 const operate = (operator, num1, num2) => {
